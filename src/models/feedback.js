@@ -39,7 +39,7 @@ const feedbackSchema = new Schema(
             trim: true,
         },
 
-        preserve:{
+        preserve: {
             type: String,
             required: false,
             trim: true,
@@ -65,7 +65,10 @@ const feedbackSchema = new Schema(
         images: {
             type: [String],
             required: false,
-        }
+        },
+        productId: {
+            type: String,
+        },
     },
     {
         toJSON: {
@@ -77,4 +80,3 @@ const feedbackSchema = new Schema(
 );
 
 export const feedbackModel = model('feedbacks', feedbackSchema);
-
