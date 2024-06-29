@@ -4,6 +4,7 @@ import { generateToken } from '../token/token.controller.js';
 import catchAsync from '../../utils/catch-async.js';
 import { userModel } from '../../models/user.model.js';
 import { googleOAuth } from '../../utils/google-auth.js';
+import lodash from 'lodash';
 
 export const signin = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
@@ -13,8 +14,10 @@ export const signin = catchAsync(async (req, res, next) => {
     if (!isEmailExisted) {
         return res.status(404).json({ message: 'Tài khoản không tồn tại!' });
     }
-
-    const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+    const isPasswordCorrect = bcrypt.compareSync(
+        password,
+        lodash.get(user, 'password', 'empty'),
+    );
 
     if (!isPasswordCorrect) {
         return res.status(403).json({ message: 'Mật khẩu không đúng!' });
