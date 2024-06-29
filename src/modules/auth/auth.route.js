@@ -1,10 +1,17 @@
 import { Router } from 'express';
-import { forgotPassword, signin, signup, update } from './auth.controller.js';
+import {
+    forgotPassword,
+    signin,
+    signinGoogle,
+    signup,
+    update,
+} from './auth.controller.js';
 
 const authRoute = Router();
 
 // đăng nhập
 authRoute.post('/signin', signin);
+authRoute.post('/signin-google', signinGoogle);
 
 // đăng kí
 authRoute.post('/signup', signup);

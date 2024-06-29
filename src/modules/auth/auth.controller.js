@@ -3,6 +3,7 @@ import { getUserByEmail } from './auth.service.js';
 import { generateToken } from '../token/token.controller.js';
 import catchAsync from '../../utils/catch-async.js';
 import { userModel } from '../../models/user.model.js';
+import { googleOAuth } from '../../utils/google-auth.js';
 
 export const signin = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
@@ -20,6 +21,34 @@ export const signin = catchAsync(async (req, res, next) => {
     }
 
     const token = generateToken({ userId: user._id }, { userId: user._id });
+
+    res.status(200).json(token);
+});
+
+export const signinGoogle = catchAsync(async (req, res, next) => {
+    const { access_token } = req.body;
+
+    let data;
+
+    const userInfo = await googleOAuth(access_token);
+
+    const { existed: isEmailExisted, data: user } = await getUserByEmail(
+        userInfo.email,
+    );
+
+    if (!isEmailExisted) {
+        const doc = await userModel.create({
+            fullname: userInfo.name,
+            avatar: userInfo.picture,
+            email: userInfo.email,
+        });
+
+        data = doc;
+    } else {
+        data = user;
+    }
+
+    const token = generateToken({ userId: data._id }, { userId: data._id });
 
     res.status(200).json(token);
 });
@@ -77,7 +106,7 @@ export const update = catchAsync(async (req, res, next) => {
             fullname,
             password: passwordHash,
             email,
-            ...otherFields
+            ...otherFields,
         },
     );
 
